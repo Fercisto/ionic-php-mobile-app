@@ -1,0 +1,38 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Perfil
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="logout()">
+        <ion-icon name="log-out-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Perfil</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <div class="welcome-card" *ngIf="user">
+    <div class="avatar-container">
+      <div class="avatar">{{ user.username.charAt(0).toUpperCase() }}</div>
+    </div>
+    <h2>¡Bienvenido, {{ user.username }}!</h2>
+    <p class="email">{{ user.email }}</p>
+  </div>
+
+  <div class="info-container" *ngIf="!user">
+    <p>No hay sesión activa detectada.</p>
+    <ion-button expand="block" (click)="goToLogin()">Ir a Iniciar Sesión</ion-button>
+  </div>
+
+  <ion-button *ngIf="user" expand="block" color="danger" (click)="logout()" class="logout-btn">
+    <ion-icon name="log-out-outline" slot="start"></ion-icon>
+    Cerrar Sesión
+  </ion-button>
+</ion-content>

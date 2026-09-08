@@ -1,0 +1,162 @@
+:host {
+  --baseColor: #606468;
+  --iconFill: var(--baseColor);
+  --bodyBackgroundColor: #2c3338;
+  --bodyColor: var(--baseColor);
+  --anchorColor: #eee;
+  --formGap: 0.875rem;
+  --loginBorderRadus: 0.25rem;
+  --loginColor: #eee;
+  --loginInputBackgroundColor: #3b4148;
+  --loginInputHoverBackgroundColor: #434a52;
+  --loginLabelBackgroundColor: #363b41;
+  --loginSubmitBackgroundColor: #ea4c88;
+  --loginSubmitColor: #eee;
+  --loginSubmitHoverBackgroundColor: #d44179;
+}
+
+ion-header {
+  ion-toolbar {
+    --background: #1e2226;
+    --color: #ffffff;
+    --border-color: #363b41;
+  }
+}
+
+ion-content {
+  --background: var(--bodyBackgroundColor);
+}
+
+.align {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100%;
+  padding: 2rem 0;
+  background-color: var(--bodyBackgroundColor);
+  color: var(--bodyColor);
+  font-family: "Open Sans", sans-serif;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.grid {
+  width: 90%;
+  max-width: 20rem;
+  margin: 0 auto;
+}
+
+.hidden {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+.icons {
+  display: none;
+}
+
+.icon {
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+  fill: var(--iconFill);
+  vertical-align: middle;
+}
+
+a {
+  color: var(--anchorColor);
+  outline: 0;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover,
+  &:focus {
+    text-decoration: underline;
+  }
+}
+
+input {
+  border: 0;
+  color: inherit;
+  font: inherit;
+  margin: 0;
+  outline: 0;
+  padding: 0;
+  transition: background-color 0.3s;
+}
+
+.form {
+  display: grid;
+  gap: var(--formGap);
+
+  &__field {
+    display: flex;
+  }
+
+  &__input {
+    flex: 1;
+    width: 100%;
+  }
+}
+
+.login {
+  color: var(--loginColor);
+
+  label,
+  input {
+    border-radius: var(--loginBorderRadus);
+    padding: 1rem;
+  }
+
+  label {
+    background-color: var(--loginLabelBackgroundColor);
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="password"] {
+    background-color: var(--loginInputBackgroundColor);
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+
+    &:focus,
+    &:hover {
+      background-color: var(--loginInputHoverBackgroundColor);
+    }
+  }
+
+  input[type="submit"] {
+    width: 100%;
+    background-color: var(--loginSubmitBackgroundColor);
+    color: var(--loginSubmitColor);
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+
+    &:focus,
+    &:hover {
+      background-color: var(--loginSubmitHoverBackgroundColor);
+    }
+  }
+}
+
+p {
+  margin: 1.5rem 0;
+}
+
+.text--center {
+  text-align: center;
+}

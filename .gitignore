@@ -1,0 +1,24 @@
+# Archivos de entorno y credenciales sensibles
+.env
+.env.local
+*.env
+
+# Archivos y carpetas de dependencias y builds de Frontend
+frontend/node_modules/
+frontend/.angular/
+frontend/.ionic/
+frontend/dist/
+frontend/www/
+frontend/coverage/
+
+# Logs y temporales
+*.log
+npm-debug.log*
+.tmp/
+*.tmp
+
+# Archivos del sistema operativo e IDEs
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

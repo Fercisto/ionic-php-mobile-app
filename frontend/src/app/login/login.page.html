@@ -1,0 +1,131 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title class="ion-text-center">
+      {{ isSignUp ? 'Crear Cuenta' : 'Iniciar Sesión' }}
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="align">
+
+    <div class="grid">
+
+      <form (submit)="onSubmit($event)" class="form login">
+
+        <!-- Username field -->
+        <div class="form__field">
+          <label for="login__username">
+            <svg class="icon">
+              <use xlink:href="#icon-user"></use>
+            </svg>
+            <span class="hidden">Username</span>
+          </label>
+          <input
+            autocomplete="username"
+            id="login__username"
+            type="text"
+            name="username"
+            [(ngModel)]="username"
+            class="form__input"
+            placeholder="Username"
+            required
+          >
+        </div>
+
+        <!-- Email field (displayed only in Sign Up mode) -->
+        <div *ngIf="isSignUp" class="form__field">
+          <label for="login__email">
+            <svg class="icon">
+              <use xlink:href="#icon-mail"></use>
+            </svg>
+            <span class="hidden">Email</span>
+          </label>
+          <input
+            autocomplete="email"
+            id="login__email"
+            type="email"
+            name="email"
+            [(ngModel)]="email"
+            class="form__input"
+            placeholder="Email"
+            required
+          >
+        </div>
+
+        <!-- Password field -->
+        <div class="form__field">
+          <label for="login__password">
+            <svg class="icon">
+              <use xlink:href="#icon-lock"></use>
+            </svg>
+            <span class="hidden">Password</span>
+          </label>
+          <input
+            id="login__password"
+            type="password"
+            name="password"
+            [(ngModel)]="password"
+            class="form__input"
+            placeholder="Password"
+            required
+          >
+        </div>
+
+        <!-- Confirm Password field (displayed only in Sign Up mode) -->
+        <div *ngIf="isSignUp" class="form__field">
+          <label for="login__confirm_password">
+            <svg class="icon">
+              <use xlink:href="#icon-lock"></use>
+            </svg>
+            <span class="hidden">Confirm Password</span>
+          </label>
+          <input
+            id="login__confirm_password"
+            type="password"
+            name="confirmPassword"
+            [(ngModel)]="confirmPassword"
+            class="form__input"
+            placeholder="Confirm Password"
+            required
+          >
+        </div>
+
+        <!-- Submit button -->
+        <div class="form__field">
+          <input type="submit" [value]="isSignUp ? 'Sign Up' : 'Sign In'" [disabled]="isLoading">
+        </div>
+
+      </form>
+
+      <!-- Toggle mode text -->
+      <p class="text--center">
+        <span>{{ isSignUp ? 'Already a member? ' : 'Not a member? ' }}</span>
+        <a href="javascript:void(0)" (click)="toggleMode()">
+          {{ isSignUp ? 'Sign in now' : 'Sign up now' }}
+        </a>
+        <svg class="icon">
+          <use xlink:href="#icon-arrow-right"></use>
+        </svg>
+      </p>
+
+    </div>
+
+    <!-- SVG Icons Collection -->
+    <svg xmlns="http://www.w3.org/2000/svg" class="icons">
+      <symbol id="icon-arrow-right" viewBox="0 0 1792 1792">
+        <path d="M1600 960q0 54-37 91l-651 651q-39 37-91 37-51 0-90-37l-75-75q-38-38-38-91t38-91l293-293H245q-52 0-84.5-37.5T128 1024V896q0-53 32.5-90.5T245 768h704L656 474q-38-36-38-90t38-90l75-75q38-38 90-38 53 0 91 38l651 651q37 35 37 90z" />
+      </symbol>
+      <symbol id="icon-lock" viewBox="0 0 1792 1792">
+        <path d="M640 768h512V576q0-106-75-181t-181-75-181 75-75 181v192zm832 96v576q0 40-28 68t-68 28H416q-40 0-68-28t-28-68V864q0-40 28-68t68-28h32V576q0-184 132-316t316-132 316 132 132 316v192h32q40 0 68 28t28 68z" />
+      </symbol>
+      <symbol id="icon-user" viewBox="0 0 1792 1792">
+        <path d="M1600 1405q0 120-73 189.5t-194 69.5H459q-121 0-194-69.5T192 1405q0-53 3.5-103.5t14-109T236 1084t43-97.5 62-81 85.5-53.5T538 832q9 0 42 21.5t74.5 48 108 48T896 971t133.5-21.5 108-48 74.5-48 42-21.5q61 0 111.5 20t85.5 53.5 62 81 43 97.5 26.5 108.5 14 109 3.5 103.5zm-320-893q0 159-112.5 271.5T896 896 624.5 783.5 512 512t112.5-271.5T896 128t271.5 112.5T1280 512z" />
+      </symbol>
+      <symbol id="icon-mail" viewBox="0 0 1792 1792">
+        <path d="M1792 710v666q0 52-38 90t-90 38H128q-52 0-90-38t-38-90V710q40 45 88 83 23 18 67 49t78 54.5T329 946t115.5 35.5T560 994t115.5-12.5T791 946t95.5-49.5t78-54.5t67-49q48-38 88-83zm0-186q0 40-28 77t-68 64q-69 49-147 101t-113.5 73.5T1320 896t-73.5 36.5T1131 946t-115.5 12.5T896 946t-115.5-12.5t-115.5-13.5t-73.5-36.5T376 839.5t-113.5-73.5T115 665q-40-27-68-64T19 524q0-54 37.5-91t91.5-37h1536q54 0 91.5 37t37.5 91z"/>
+      </symbol>
+    </svg>
+
+  </div>
+</ion-content>
