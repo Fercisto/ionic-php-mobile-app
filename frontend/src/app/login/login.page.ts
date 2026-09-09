@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonHeader, IonToolbar, IonTitle, IonContent, NavController } from '@ionic/angular';
+import { IonHeader, IonToolbar, IonTitle, IonContent, NavController, ToastController } from '@ionic/angular';
 import { AuthService } from '../services/auth.service';
 
 @Component({
@@ -13,6 +13,7 @@ import { AuthService } from '../services/auth.service';
 export class LoginPage implements OnInit {
   private authService = inject(AuthService);
   private navCtrl = inject(NavController);
+  private toastCtrl = inject(ToastController);
 
   isSignUp: boolean = false;
   username: string = '';
@@ -27,6 +28,16 @@ export class LoginPage implements OnInit {
     }
   }
 
+  async presentToast(message: string, color: 'success' | 'danger' | 'warning' = 'success'): Promise<void> {
+    const toast = await this.toastCtrl.create({
+      message,
+      duration: 2500,
+      position: 'bottom',
+      color
+    });
+    await toast.present();
+  }
+
   toggleMode(): void {
     this.isSignUp = !this.isSignUp;
     this.resetForm();
@@ -37,12 +48,12 @@ export class LoginPage implements OnInit {
 
     if (this.isSignUp) {
       if (!this.username.trim() || !this.email.trim() || !this.password) {
-        alert('Por favor completa todos los campos.');
+        this.presentToast('Por favor completa todos los campos.', 'warning');
         return;
       }
 
       if (this.password !== this.confirmPassword) {
-        alert('Las contraseñas no coinciden.');
+        this.presentToast('Las contraseñas no coinciden.', 'warning');
         return;
       }
 
@@ -54,19 +65,19 @@ export class LoginPage implements OnInit {
       }).subscribe({
         next: (res) => {
           this.isLoading = false;
-          alert(res.message || '¡Cuenta creada exitosamente!');
+          this.presentToast(res.message || '¡Cuenta creada exitosamente!', 'success');
           this.isSignUp = false;
           this.resetForm();
         },
         error: (err) => {
           this.isLoading = false;
           const msg = err.error?.message || 'Error al conectar con el servidor PHP.';
-          alert(`Error: ${msg}`);
+          this.presentToast(`Error: ${msg}`, 'danger');
         }
       });
     } else {
       if (!this.username.trim() || !this.password) {
-        alert('Ingresa tu usuario y contraseña.');
+        this.presentToast('Ingresa tu usuario y contraseña.', 'warning');
         return;
       }
 
@@ -80,12 +91,13 @@ export class LoginPage implements OnInit {
           if (res.user) {
             this.authService.saveSession(res.user);
           }
+          this.presentToast(res.message || '¡Bienvenido!', 'success');
           this.navCtrl.navigateRoot('/tabs/tab1');
         },
         error: (err) => {
           this.isLoading = false;
           const msg = err.error?.message || 'Error de autenticación. Verifica tus datos o el servidor PHP.';
-          alert(`Error: ${msg}`);
+          this.presentToast(`Error: ${msg}`, 'danger');
         }
       });
     }

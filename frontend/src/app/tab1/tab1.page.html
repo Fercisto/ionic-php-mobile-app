@@ -1,17 +1,194 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>
-      Inicio
+      Usuarios
     </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="loadUsers()" [disabled]="isLoadingList">
+        <ion-icon name="refresh-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
+<ion-content [fullscreen]="true" class="ion-padding custom-content">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Inicio</ion-title>
+      <ion-title size="large">Usuarios</ion-title>
     </ion-toolbar>
   </ion-header>
 
-  <!-- Tab1 contenido principal vacío por el momento -->
+  <!-- BARRA DE ACCIÓN SUPERIOR -->
+  <div class="top-action-bar">
+    <div class="list-info">
+      <h3>Lista de Usuarios</h3>
+      <span class="badge">{{ users.length }}</span>
+    </div>
+
+    <button type="button" class="btn-add-user" (click)="openCreateModal()">
+      <ion-icon name="person-add-outline"></ion-icon>
+      <span>Agregar Usuario</span>
+    </button>
+  </div>
+
+  <!-- ESTADO DE CARGA -->
+  <div *ngIf="isLoadingList" class="state-msg">
+    <ion-spinner name="crescent"></ion-spinner>
+    <span>Cargando usuarios...</span>
+  </div>
+
+  <!-- ESTADO VACÍO -->
+  <div *ngIf="!isLoadingList && users.length === 0" class="state-msg">
+    <span>No hay usuarios registrados.</span>
+  </div>
+
+  <!-- TABLA / LISTA DE USUARIOS -->
+  <div *ngIf="!isLoadingList && users.length > 0" class="user-list">
+    <div *ngFor="let u of users" class="user-item">
+      <div class="user-info">
+        <span class="user-name">{{ u.username }}</span>
+        <span class="user-email">{{ u.email }}</span>
+      </div>
+
+      <div class="user-actions">
+        <button type="button" class="btn-icon edit" (click)="openEditModal(u)" title="Editar">
+          <ion-icon name="create-outline"></ion-icon>
+        </button>
+        <button type="button" class="btn-icon delete" (click)="confirmDelete(u)" title="Eliminar">
+          <ion-icon name="trash-outline"></ion-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 1: REGISTRAR USUARIO -->
+  <ion-modal [isOpen]="isCreateModalOpen" (didDismiss)="closeCreateModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Nuevo Usuario</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeCreateModal()">
+              <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding custom-content">
+        <div class="form-card modal-card">
+          <h2 class="card-title">Registrar Usuario</h2>
+
+          <form (submit)="onCreateSubmit($event)" class="clean-form">
+            <div class="form-field">
+              <label for="create_username">Usuario</label>
+              <input
+                id="create_username"
+                type="text"
+                name="username"
+                [(ngModel)]="createForm.username"
+                placeholder="Nombre de usuario"
+                required
+              />
+            </div>
+
+            <div class="form-field">
+              <label for="create_email">Correo electrónico</label>
+              <input
+                id="create_email"
+                type="email"
+                name="email"
+                [(ngModel)]="createForm.email"
+                placeholder="correo@ejemplo.com"
+                required
+              />
+            </div>
+
+            <div class="form-field">
+              <label for="create_password">Contraseña</label>
+              <input
+                id="create_password"
+                type="password"
+                name="password"
+                [(ngModel)]="createForm.password"
+                placeholder="Contraseña"
+                required
+              />
+            </div>
+
+            <div class="modal-actions">
+              <button type="button" class="btn-secondary" (click)="closeCreateModal()">Cancelar</button>
+              <button type="submit" class="btn-primary" [disabled]="isSubmitting">
+                {{ isSubmitting ? 'Guardando...' : 'Registrar Usuario' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <!-- MODAL 2: EDITAR USUARIO -->
+  <ion-modal [isOpen]="isEditModalOpen" (didDismiss)="closeEditModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Editar Usuario</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeEditModal()">
+              <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding custom-content">
+        <div class="form-card modal-card" *ngIf="selectedUser">
+          <h2 class="card-title">Editar ID #{{ selectedUser.id }}</h2>
+
+          <form (submit)="onUpdateSubmit($event)" class="clean-form">
+            <div class="form-field">
+              <label for="edit_username">Usuario</label>
+              <input
+                id="edit_username"
+                type="text"
+                name="edit_username"
+                [(ngModel)]="editForm.username"
+                required
+              />
+            </div>
+
+            <div class="form-field">
+              <label for="edit_email">Correo electrónico</label>
+              <input
+                id="edit_email"
+                type="email"
+                name="edit_email"
+                [(ngModel)]="editForm.email"
+                required
+              />
+            </div>
+
+            <div class="form-field">
+              <label for="edit_password">Nueva Contraseña (Opcional)</label>
+              <input
+                id="edit_password"
+                type="password"
+                name="edit_password"
+                [(ngModel)]="editForm.password"
+                placeholder="Dejar en blanco para conservar"
+              />
+            </div>
+
+            <div class="modal-actions">
+              <button type="button" class="btn-secondary" (click)="closeEditModal()">Cancelar</button>
+              <button type="submit" class="btn-primary" [disabled]="isSubmitting">
+                {{ isSubmitting ? 'Guardando...' : 'Guardar Cambios' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>
