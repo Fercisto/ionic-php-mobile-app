@@ -86,10 +86,10 @@ export class LoginPage implements OnInit {
         username: this.username.trim(),
         password: this.password
       }).subscribe({
-        next: (res) => {
+        next: async (res) => {
           this.isLoading = false;
           if (res.user) {
-            this.authService.saveSession(res.user);
+            await this.authService.saveSession(res.user);
           }
           this.presentToast(res.message || '¡Bienvenido!', 'success');
           this.navCtrl.navigateRoot('/tabs/tab1');
