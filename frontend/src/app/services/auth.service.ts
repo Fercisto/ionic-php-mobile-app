@@ -1,8 +1,9 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { StorageService } from './storage.service';
+import { NetworkService } from './network.service';
 
 export interface UserProfile {
   id: number;
@@ -22,6 +23,7 @@ export interface AuthResponse {
 export class AuthService {
   private http = inject(HttpClient);
   private storage = inject(StorageService);
+  private network = inject(NetworkService);
   private apiUrl = environment.apiUrl;
   private USER_KEY = 'auth_user_session';
 
@@ -29,14 +31,14 @@ export class AuthService {
    * Enviar datos de registro a PHP
    */
   register(userData: { username: string; email: string; password: string }): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/register.php`, userData);
+    return this.request(this.http.post<AuthResponse>(`${this.apiUrl}/register.php`, userData));
   }
 
   /**
    * Enviar credenciales de inicio de sesión a PHP
    */
   login(credentials: { username: string; password: string }): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login.php`, credentials);
+    return this.request(this.http.post<AuthResponse>(`${this.apiUrl}/login.php`, credentials));
   }
 
   /**
@@ -65,5 +67,37 @@ export class AuthService {
    */
   logout(): void {
     this.storage.remove(this.USER_KEY);
+  }
+
+  private request<T>(request$: Observable<T>): Observable<T> {
+    if (!this.network.isOnline) {
+      return throwError(() => this.connectionError());
+    }
+
+    return request$.pipe(
+      catchError((error: HttpErrorResponse) => throwError(() => this.withMessage(
+        error,
+        'No fue posible comunicarse con el servidor.'
+      )))
+    );
+  }
+
+  private connectionError(): HttpErrorResponse {
+    return new HttpErrorResponse({
+      status: 0,
+      error: { message: 'No hay conexión a Internet. Verifica tu red e inténtalo de nuevo.' }
+    });
+  }
+
+  private withMessage(error: HttpErrorResponse, fallback: string): HttpErrorResponse {
+    const message = error.error?.message || (error.status === 0 ?
+      'No hay conexión a Internet. Verifica tu red e inténtalo de nuevo.' : fallback);
+    return new HttpErrorResponse({
+      error: { ...(error.error || {}), message },
+      headers: error.headers,
+      status: error.status,
+      statusText: error.statusText,
+      url: error.url || undefined
+    });
   }
 }

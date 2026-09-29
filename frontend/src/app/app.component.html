@@ -1,3 +1,8 @@
 <ion-app>
+  @if ((network.online$ | async) === false) {
+    <div class="connection-banner" role="alert">
+      Sin conexión. Se mostrarán los datos guardados cuando estén disponibles.
+    </div>
+  }
   <ion-router-outlet></ion-router-outlet>
 </ion-app>
