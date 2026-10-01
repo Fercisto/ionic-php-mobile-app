@@ -4,6 +4,9 @@ const config: CapacitorConfig = {
   appName: "Photo Gallery Cap Ng",
   npmClient: "npm",
   webDir: "www",
+  server: {
+    cleartext: true,
+  },
 };
 
 export default config;
