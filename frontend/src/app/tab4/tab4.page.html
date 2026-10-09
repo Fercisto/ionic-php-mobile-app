@@ -1,0 +1,92 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Estadísticas</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="loadData()" color="primary">
+        <ion-icon slot="icon-only" name="refresh-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="custom-content ion-padding" (ionScroll)="hideTooltip()" [scrollEvents]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="loadData($event)">
+    <ion-refresher-content pullingText="Desliza para actualizar..." refreshingSpinner="circles">
+    </ion-refresher-content>
+  </ion-refresher>
+
+  <div class="page-intro">
+    <h2 class="welcome-title">Tu progreso</h2>
+    <p class="welcome-sub">Resumen visual de tus proyectos y tareas</p>
+  </div>
+
+  @if (isLoading && myTasks.length === 0 && projects.length === 0) {
+    <div class="state-box">
+      <ion-spinner name="crescent"></ion-spinner>
+    </div>
+  } @else if (errorMessage) {
+    <div class="state-box">
+      <p>{{ errorMessage }}</p>
+    </div>
+  } @else {
+    <!-- Indicadores rápidos -->
+    <div class="kpi-grid">
+      <div class="kpi">
+        <span class="kpi-num">{{ projects.length }}</span>
+        <span class="kpi-label">Proyectos</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi-num">{{ myTasks.length }}</span>
+        <span class="kpi-label">Mis tareas</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi-num" [class.alert]="overdueCount > 0">{{ overdueCount }}</span>
+        <span class="kpi-label">Vencidas</span>
+      </div>
+    </div>
+
+    <!-- Dona: tareas por estado -->
+    <section class="chart-card">
+      <h3 class="chart-title">Mis tareas por estado</h3>
+      @if (myTasks.length > 0) {
+        <div class="donut-layout">
+          <div #statusChart class="donut-chart"></div>
+          <ul class="legend">
+            @for (slice of statusSlices; track slice.key) {
+              <li>
+                <span class="swatch" [style.background]="slice.color"></span>
+                <span class="legend-label">{{ slice.label }}</span>
+                <span class="legend-value">{{ slice.value }}</span>
+              </li>
+            }
+          </ul>
+        </div>
+      } @else {
+        <p class="empty">Aún no tienes tareas asignadas.</p>
+      }
+    </section>
+
+    <!-- Barras horizontales: avance por proyecto -->
+    <section class="chart-card">
+      <h3 class="chart-title">Avance por proyecto</h3>
+      <p class="chart-sub">Porcentaje de tareas completadas</p>
+      @if (projectsWithTasks.length > 0) {
+        <div #projectsChart class="full-chart"></div>
+      } @else {
+        <p class="empty">Tus proyectos todavía no tienen tareas.</p>
+      }
+    </section>
+
+    <!-- Barras verticales: tareas por prioridad -->
+    <section class="chart-card">
+      <h3 class="chart-title">Mis tareas por prioridad</h3>
+      @if (myTasks.length > 0) {
+        <div #priorityChart class="full-chart"></div>
+      } @else {
+        <p class="empty">Sin datos de prioridad.</p>
+      }
+    </section>
+  }
+
+  <div #tooltip class="chart-tooltip" role="tooltip"></div>
+</ion-content>

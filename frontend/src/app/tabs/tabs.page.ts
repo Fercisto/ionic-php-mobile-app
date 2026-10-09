@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { folderOpenOutline, checkboxOutline, personOutline } from 'ionicons/icons';
+import { folderOpenOutline, checkboxOutline, personOutline, statsChartOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-tabs',
@@ -11,6 +11,6 @@ import { folderOpenOutline, checkboxOutline, personOutline } from 'ionicons/icon
 })
 export class TabsPage {
   constructor() {
-    addIcons({ folderOpenOutline, checkboxOutline, personOutline });
+    addIcons({ folderOpenOutline, checkboxOutline, personOutline, statsChartOutline });
   }
 }

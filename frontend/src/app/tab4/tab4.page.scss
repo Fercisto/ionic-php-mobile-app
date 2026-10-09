@@ -1,0 +1,185 @@
+ion-header {
+  ion-toolbar {
+    --background: #1e2226;
+    --color: #ffffff;
+    --border-color: #363b41;
+  }
+}
+
+.custom-content {
+  --background: #2c3338;
+}
+
+.page-intro {
+  margin-bottom: 1.25rem;
+
+  .welcome-title {
+    margin: 0;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #ffffff;
+  }
+
+  .welcome-sub {
+    margin: 0.25rem 0 0 0;
+    font-size: 0.85rem;
+    color: #9da3a8;
+  }
+}
+
+.state-box {
+  display: flex;
+  justify-content: center;
+  padding: 3rem 1rem;
+  color: #9da3a8;
+  text-align: center;
+}
+
+/* =========================================================================
+   INDICADORES
+   ========================================================================= */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+
+  .kpi {
+    background-color: #353b41;
+    border: 1px solid #434a52;
+    border-radius: 0.5rem;
+    padding: 0.75rem 0.4rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .kpi-num {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ffffff;
+    font-variant-numeric: tabular-nums;
+
+    &.alert {
+      color: #f87171;
+    }
+  }
+
+  .kpi-label {
+    font-size: 0.72rem;
+    color: #9da3a8;
+    margin-top: 0.15rem;
+  }
+}
+
+/* =========================================================================
+   TARJETAS DE GRÁFICOS
+   ========================================================================= */
+.chart-card {
+  background-color: #353b41;
+  border: 1px solid #434a52;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+
+  .chart-title {
+    margin: 0 0 0.75rem 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #ffffff;
+  }
+
+  .chart-sub {
+    margin: -0.5rem 0 0.75rem 0;
+    font-size: 0.75rem;
+    color: #9da3a8;
+  }
+
+  .empty {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #9da3a8;
+  }
+}
+
+.full-chart {
+  width: 100%;
+
+  ::ng-deep svg {
+    display: block;
+  }
+}
+
+.donut-layout {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+
+  .donut-chart {
+    flex: 0 0 auto;
+    width: min(50%, 200px);
+
+    ::ng-deep svg {
+      display: block;
+    }
+  }
+}
+
+.legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0;
+    font-size: 0.85rem;
+  }
+
+  .swatch {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    flex: 0 0 auto;
+  }
+
+  .legend-label {
+    color: #c9ced2;
+    flex: 1;
+  }
+
+  .legend-value {
+    color: #ffffff;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* =========================================================================
+   TOOLTIP (posicionado con JS)
+   ========================================================================= */
+.chart-tooltip {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s;
+  background: #1e2226;
+  border: 1px solid #434a52;
+  border-radius: 0.5rem;
+  padding: 0.45rem 0.65rem;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: #c9ced2;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+
+  ::ng-deep strong {
+    color: #ffffff;
+  }
+}
