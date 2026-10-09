@@ -1,125 +1,194 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      Usuarios
-    </ion-title>
+    <ion-title>TeamFlow</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="loadUsers()" [disabled]="isLoadingList">
-        <ion-icon name="refresh-outline" slot="icon-only"></ion-icon>
+      <ion-button (click)="openCreateProjectModal()" color="primary" class="header-action-btn">
+        <ion-icon slot="start" name="add-circle-outline"></ion-icon>
+        Nuevo
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding custom-content">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Usuarios</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [fullscreen]="true" class="custom-content ion-padding">
+  <!-- Refresher -->
+  <ion-refresher slot="fixed" (ionRefresh)="loadProjects($event)">
+    <ion-refresher-content pullingText="Desliza para actualizar..." refreshingSpinner="circles">
+    </ion-refresher-content>
+  </ion-refresher>
 
-  <!-- BARRA DE ACCIÓN SUPERIOR -->
-  <div class="top-action-bar">
-    <div class="list-info">
-      <h3>Lista de Usuarios</h3>
-      <span class="badge">{{ users.length }}</span>
+  <!-- Barra de bienvenida y resumen -->
+  <div class="projects-summary-bar">
+    <div>
+      <h2 class="welcome-title">Mis Proyectos</h2>
+      <p class="welcome-sub">Organiza tu equipo y distribuye tareas académicas</p>
     </div>
-
-    <button type="button" class="btn-add-user" (click)="openCreateModal()">
-      <ion-icon name="person-add-outline"></ion-icon>
-      <span>Agregar Usuario</span>
-    </button>
-  </div>
-
-  <!-- ESTADO DE CARGA -->
-  <div *ngIf="isLoadingList" class="state-msg">
-    <ion-spinner name="crescent"></ion-spinner>
-    <span>Cargando usuarios...</span>
-  </div>
-
-  <!-- ESTADO VACÍO -->
-  <div *ngIf="!isLoadingList && users.length === 0" class="state-msg">
-    <span>No hay usuarios registrados.</span>
-  </div>
-
-  <!-- TABLA / LISTA DE USUARIOS -->
-  <div *ngIf="!isLoadingList && users.length > 0" class="user-list">
-    <div *ngFor="let u of users" class="user-item">
-      <div class="user-info">
-        <span class="user-name">{{ u.username }}</span>
-        <span class="user-email">{{ u.email }}</span>
+    @if (projects.length > 0) {
+      <div class="badge-counter">
+        {{ projects.length }} {{ projects.length === 1 ? 'proyecto' : 'proyectos' }}
       </div>
+    }
+  </div>
 
-      <div class="user-actions">
-        <button type="button" class="btn-icon edit" (click)="openEditModal(u)" title="Editar">
-          <ion-icon name="create-outline"></ion-icon>
-        </button>
-        <button type="button" class="btn-icon delete" (click)="confirmDelete(u)" title="Eliminar">
-          <ion-icon name="trash-outline"></ion-icon>
-        </button>
-      </div>
+  <!-- Spinner de carga inicial -->
+  @if (isLoadingProjects && projects.length === 0) {
+    <div class="state-msg">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+      <span>Cargando proyectos...</span>
     </div>
-  </div>
+  }
 
-  <!-- MODAL 1: REGISTRAR USUARIO -->
-  <ion-modal [isOpen]="isCreateModalOpen" (didDismiss)="closeCreateModal()">
+  <!-- Estado vacío -->
+  @if (!isLoadingProjects && projects.length === 0) {
+    <div class="empty-state">
+      <ion-icon name="folder-open-outline" class="empty-icon"></ion-icon>
+      <h3>No tienes proyectos aún</h3>
+      <p>Crea tu primer proyecto escolar e invita a tus compañeros de equipo para asignar tareas.</p>
+      <button type="button" class="btn-primary" (click)="openCreateProjectModal()">
+        <ion-icon name="add-circle-outline"></ion-icon>
+        Crear Primer Proyecto
+      </button>
+    </div>
+  }
+
+  <!-- Lista de Tarjetas de Proyectos -->
+  @if (projects.length > 0) {
+    <div class="projects-grid">
+      @for (project of projects; track project.id) {
+        <div
+          class="project-card"
+          tabindex="0"
+          role="button"
+          (click)="openProjectDetail(project)"
+          (keydown.enter)="openProjectDetail(project)"
+        >
+          <div class="card-top">
+            <div class="card-header-left">
+              <span class="role-badge" [class.owner]="project.current_user_role === 'owner'">
+                {{ project.current_user_role === 'owner' ? 'Líder' : 'Miembro' }}
+              </span>
+              <span class="status-badge" [class.completed]="project.status === 'completed'">
+                {{ project.status === 'completed' ? 'Completado' : 'Activo' }}
+              </span>
+            </div>
+            @if (project.current_user_role === 'owner') {
+              <div class="card-header-actions">
+                <button
+                  type="button"
+                  class="btn-icon-tiny"
+                  (click)="openEditProjectModal(project, $event)"
+                  title="Editar"
+                >
+                  <ion-icon name="create-outline"></ion-icon>
+                </button>
+                <button
+                  type="button"
+                  class="btn-icon-tiny delete"
+                  (click)="confirmDeleteProject(project, $event)"
+                  title="Eliminar"
+                >
+                  <ion-icon name="trash-outline"></ion-icon>
+                </button>
+              </div>
+            }
+          </div>
+
+          <h3 class="project-title">{{ project.title }}</h3>
+          <p class="project-desc">{{ project.description || 'Sin descripción especificada.' }}</p>
+
+          <!-- Progreso de Tareas -->
+          <div class="progress-section">
+            <div class="progress-labels">
+              <span>Progreso de tareas</span>
+              <strong>{{ project.completed_tasks_count || 0 }}/{{ project.tasks_count || 0 }}</strong>
+            </div>
+            <ion-progress-bar [value]="calculateProjectProgress(project)" color="success"></ion-progress-bar>
+          </div>
+
+          <!-- Footer de la tarjeta -->
+          <div class="card-footer">
+            <div class="footer-meta">
+              <span class="meta-item">
+                <ion-icon name="people-outline"></ion-icon>
+                {{ project.members_count || 1 }} {{ project.members_count === 1 ? 'miembro' : 'miembros' }}
+              </span>
+              <span class="meta-item">
+                <ion-icon name="list-outline"></ion-icon>
+                {{ project.tasks_count || 0 }} tareas
+              </span>
+            </div>
+            <div class="open-action">
+              <span>Ver</span>
+              <ion-icon name="arrow-forward-outline"></ion-icon>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ================================================================= -->
+  <!-- MODAL: CREAR / EDITAR PROYECTO -->
+  <!-- ================================================================= -->
+  <ion-modal [isOpen]="isProjectModalOpen" (didDismiss)="closeProjectModal()">
     <ng-template>
       <ion-header>
         <ion-toolbar>
-          <ion-title>Nuevo Usuario</ion-title>
+          <ion-title>{{ isEditingProject ? 'Editar Proyecto' : 'Nuevo Proyecto' }}</ion-title>
           <ion-buttons slot="end">
-            <ion-button (click)="closeCreateModal()">
-              <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+            <ion-button (click)="closeProjectModal()">
+              <ion-icon slot="icon-only" name="close-outline"></ion-icon>
             </ion-button>
           </ion-buttons>
         </ion-toolbar>
       </ion-header>
 
-      <ion-content class="ion-padding custom-content">
+      <ion-content class="custom-content ion-padding">
         <div class="form-card modal-card">
-          <h2 class="card-title">Registrar Usuario</h2>
-
-          <form (submit)="onCreateSubmit($event)" class="clean-form">
+          <form (ngSubmit)="onSaveProjectSubmit()" class="clean-form">
             <div class="form-field">
-              <label for="create_username">Usuario</label>
+              <label for="proj-title">Título del Proyecto *</label>
               <input
-                id="create_username"
+                id="proj-title"
                 type="text"
-                name="username"
-                [(ngModel)]="createForm.username"
-                placeholder="Nombre de usuario"
+                placeholder="Ej. Proyecto Móvil - Entrega Final"
+                [(ngModel)]="projectForm.title"
+                name="projTitle"
                 required
               />
             </div>
 
             <div class="form-field">
-              <label for="create_email">Correo electrónico</label>
-              <input
-                id="create_email"
-                type="email"
-                name="email"
-                [(ngModel)]="createForm.email"
-                placeholder="correo@ejemplo.com"
-                required
-              />
+              <label for="proj-desc">Descripción</label>
+              <textarea
+                id="proj-desc"
+                rows="3"
+                placeholder="Objetivo del proyecto, metas o notas de equipo..."
+                [(ngModel)]="projectForm.description"
+                name="projDesc"
+                class="clean-textarea"
+              ></textarea>
             </div>
 
-            <div class="form-field">
-              <label for="create_password">Contraseña</label>
-              <input
-                id="create_password"
-                type="password"
-                name="password"
-                [(ngModel)]="createForm.password"
-                placeholder="Contraseña"
-                required
-              />
-            </div>
+            @if (isEditingProject) {
+              <div class="form-field">
+                <label for="proj-status">Estado del Proyecto</label>
+                <select id="proj-status" [(ngModel)]="projectForm.status" name="projStatus" class="clean-select">
+                  <option value="active">Activo</option>
+                  <option value="completed">Completado</option>
+                  <option value="archived">Archivado</option>
+                </select>
+              </div>
+            }
 
             <div class="modal-actions">
-              <button type="button" class="btn-secondary" (click)="closeCreateModal()">Cancelar</button>
-              <button type="submit" class="btn-primary" [disabled]="isSubmitting">
-                {{ isSubmitting ? 'Guardando...' : 'Registrar Usuario' }}
+              <button type="button" class="btn-secondary" (click)="closeProjectModal()">Cancelar</button>
+              <button type="submit" class="btn-primary" [disabled]="isSubmittingProject">
+                @if (!isSubmittingProject) {
+                  <span>{{ isEditingProject ? 'Guardar Cambios' : 'Crear Proyecto' }}</span>
+                } @else {
+                  <ion-spinner name="dots"></ion-spinner>
+                }
               </button>
             </div>
           </form>
@@ -128,66 +197,396 @@
     </ng-template>
   </ion-modal>
 
-  <!-- MODAL 2: EDITAR USUARIO -->
-  <ion-modal [isOpen]="isEditModalOpen" (didDismiss)="closeEditModal()">
+  <!-- ================================================================= -->
+  <!-- MODAL: DETALLE DE PROYECTO (TAREAS Y MIEMBROS) -->
+  <!-- ================================================================= -->
+  <ion-modal [isOpen]="isDetailModalOpen" (didDismiss)="closeDetailModal()">
     <ng-template>
       <ion-header>
         <ion-toolbar>
-          <ion-title>Editar Usuario</ion-title>
+          <ion-title>{{ selectedProject?.title }}</ion-title>
           <ion-buttons slot="end">
-            <ion-button (click)="closeEditModal()">
-              <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+            <ion-button (click)="closeDetailModal()">
+              <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+
+        <!-- Segmentos: Tareas / Miembros -->
+        <ion-toolbar class="segment-toolbar">
+          <div class="custom-segment-container">
+            <button
+              type="button"
+              class="tab-pill"
+              [class.active]="detailSegment === 'tasks'"
+              (click)="detailSegment = 'tasks'"
+            >
+              <ion-icon name="checkbox-outline"></ion-icon>
+              Tareas ({{ projectTasks.length }})
+            </button>
+            <button
+              type="button"
+              class="tab-pill"
+              [class.active]="detailSegment === 'members'"
+              (click)="detailSegment = 'members'"
+            >
+              <ion-icon name="people-outline"></ion-icon>
+              Equipo ({{ projectMembers.length }})
+            </button>
+          </div>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="custom-content ion-padding">
+        <!-- Spinner mientras carga el detalle -->
+        @if (isLoadingDetail) {
+          <div class="state-msg">
+            <ion-spinner name="crescent" color="primary"></ion-spinner>
+            <span>Cargando datos del proyecto...</span>
+          </div>
+        }
+
+        @if (!isLoadingDetail && selectedProject) {
+          <!-- =========================================================== -->
+          <!-- PESTAÑA: TAREAS -->
+          <!-- =========================================================== -->
+          @if (detailSegment === 'tasks') {
+            <div>
+              <!-- Barra de Filtros y Crear Tarea -->
+              <div class="tasks-action-bar">
+                <div class="filter-pills">
+                  <button type="button" [class.active]="taskFilter === 'all'" (click)="taskFilter = 'all'">Todas</button>
+                  <button type="button" [class.active]="taskFilter === 'pending'" (click)="taskFilter = 'pending'">Pendientes</button>
+                  <button type="button" [class.active]="taskFilter === 'in_progress'" (click)="taskFilter = 'in_progress'">En curso</button>
+                  <button type="button" [class.active]="taskFilter === 'completed'" (click)="taskFilter = 'completed'">Completadas</button>
+                </div>
+                <button type="button" class="btn-create-task" (click)="openCreateTaskModal()">
+                  <ion-icon name="add-circle-outline"></ion-icon>
+                  Nueva Tarea
+                </button>
+              </div>
+
+              <!-- Progreso rápido -->
+              @if (projectTasks.length > 0) {
+                <div class="detail-progress-card">
+                  <div class="progress-info">
+                    <span>Progreso total: <strong>{{ completedTasksCount }}/{{ projectTasks.length }} completadas</strong></span>
+                    <span>{{ (projectProgress * 100) | number:'1.0-0' }}%</span>
+                  </div>
+                  <ion-progress-bar [value]="projectProgress" color="success"></ion-progress-bar>
+                </div>
+              }
+
+              <!-- Lista de Tareas -->
+              @if (filteredTasks.length === 0) {
+                <div class="empty-tasks-state">
+                  <ion-icon name="list-outline"></ion-icon>
+                  @if (projectTasks.length === 0) {
+                    <p>Aún no hay tareas creadas en este proyecto.</p>
+                  } @else {
+                    <p>No hay tareas que coincidan con este filtro.</p>
+                  }
+                  @if (projectTasks.length === 0) {
+                    <button type="button" class="btn-secondary-small" (click)="openCreateTaskModal()">
+                      Crear Primera Tarea
+                    </button>
+                  }
+                </div>
+              }
+
+              @if (filteredTasks.length > 0) {
+                <div class="tasks-list">
+                  @for (task of filteredTasks; track task.id) {
+                    <div
+                      class="task-item-card"
+                      [class.completed]="task.status === 'completed'"
+                    >
+                      <!-- Checkbox interactivo de cambio de estado -->
+                      <button
+                        type="button"
+                        class="task-status-btn"
+                        [class.status-pending]="task.status === 'pending'"
+                        [class.status-progress]="task.status === 'in_progress'"
+                        [class.status-done]="task.status === 'completed'"
+                        (click)="toggleTaskStatus(task)"
+                        title="Cambiar estado"
+                      >
+                        <ion-icon
+                          [name]="task.status === 'completed' ? 'checkmark-circle-outline' : (task.status === 'in_progress' ? 'time-outline' : 'ellipse-outline')"
+                        ></ion-icon>
+                      </button>
+
+                      <!-- Info de la tarea -->
+                      <div class="task-info">
+                        <div class="task-title-row">
+                          <h4 class="task-title" [class.strikethrough]="task.status === 'completed'">{{ task.title }}</h4>
+                          <span class="priority-pill" [class]="'priority-' + task.priority">
+                            {{ getPriorityLabel(task.priority) }}
+                          </span>
+                        </div>
+
+                        @if (task.description) {
+                          <p class="task-desc">{{ task.description }}</p>
+                        }
+
+                        <div class="task-badges">
+                          <span class="status-chip" [class]="'chip-' + task.status">
+                            {{ getStatusLabel(task.status) }}
+                          </span>
+                          @if (task.assigned_username) {
+                            <span class="assigned-chip">
+                              <ion-icon name="person-outline"></ion-icon>
+                              {{ task.assigned_username }}
+                            </span>
+                          } @else {
+                            <span class="unassigned-chip">
+                              Sin asignar
+                            </span>
+                          }
+                          @if (task.due_date) {
+                            <span class="due-chip">
+                              <ion-icon name="calendar-outline"></ion-icon>
+                              {{ task.due_date }}
+                            </span>
+                          }
+                        </div>
+                      </div>
+
+                      <!-- Acciones de tarea -->
+                      <div class="task-actions">
+                        <button type="button" class="btn-icon-tiny" (click)="openEditTaskModal(task)" title="Editar tarea">
+                          <ion-icon name="create-outline"></ion-icon>
+                        </button>
+                        <button type="button" class="btn-icon-tiny delete" (click)="confirmDeleteTask(task)" title="Eliminar tarea">
+                          <ion-icon name="trash-outline"></ion-icon>
+                        </button>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+
+          <!-- =========================================================== -->
+          <!-- PESTAÑA: MIEMBROS & EQUIPO -->
+          <!-- =========================================================== -->
+          @if (detailSegment === 'members') {
+            <div>
+              <div class="members-action-bar">
+                <div>
+                  <h3 class="section-title">Integrantes del Equipo</h3>
+                  <p class="section-subtitle">Personas que pueden colaborar y tener tareas asignadas</p>
+                </div>
+                <button type="button" class="btn-invite" (click)="openInviteModal()">
+                  <ion-icon name="person-add-outline"></ion-icon>
+                  Invitar
+                </button>
+              </div>
+
+              <div class="members-list">
+                @for (member of projectMembers; track member.user_id) {
+                  <div class="member-item-card">
+                    <div class="member-avatar">
+                      {{ (member.username[0] || 'U') | uppercase }}
+                    </div>
+                    <div class="member-info">
+                      <div class="member-name-row">
+                        <span class="member-name">{{ member.username }}</span>
+                        <span class="member-role-badge" [class.owner]="member.role === 'owner'">
+                          {{ member.role === 'owner' ? 'Líder / Creador' : 'Colaborador' }}
+                        </span>
+                      </div>
+                      <span class="member-email">{{ member.email }}</span>
+                    </div>
+                    @if (isCurrentUserOwner && member.role !== 'owner') {
+                      <div class="member-actions">
+                        <button
+                          type="button"
+                          class="btn-icon-tiny delete"
+                          (click)="confirmRemoveMember(member)"
+                          title="Remover miembro"
+                        >
+                          <ion-icon name="trash-outline"></ion-icon>
+                        </button>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        }
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <!-- ================================================================= -->
+  <!-- MODAL: CREAR / EDITAR TAREA -->
+  <!-- ================================================================= -->
+  <ion-modal [isOpen]="isTaskModalOpen" (didDismiss)="closeTaskModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>{{ isEditingTask ? 'Editar Tarea' : 'Nueva Tarea' }}</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeTaskModal()">
+              <ion-icon slot="icon-only" name="close-outline"></ion-icon>
             </ion-button>
           </ion-buttons>
         </ion-toolbar>
       </ion-header>
 
-      <ion-content class="ion-padding custom-content">
-        <div class="form-card modal-card" *ngIf="selectedUser">
-          <h2 class="card-title">Editar ID #{{ selectedUser.id }}</h2>
-
-          <form (submit)="onUpdateSubmit($event)" class="clean-form">
+      <ion-content class="custom-content ion-padding">
+        <div class="form-card modal-card">
+          <form (ngSubmit)="onSaveTaskSubmit()" class="clean-form">
             <div class="form-field">
-              <label for="edit_username">Usuario</label>
+              <label for="task-title">Título de la Tarea *</label>
               <input
-                id="edit_username"
+                id="task-title"
                 type="text"
-                name="edit_username"
-                [(ngModel)]="editForm.username"
+                placeholder="Ej. Diseñar interfaz de usuario"
+                [(ngModel)]="taskForm.title"
+                name="taskTitle"
                 required
               />
             </div>
 
             <div class="form-field">
-              <label for="edit_email">Correo electrónico</label>
-              <input
-                id="edit_email"
-                type="email"
-                name="edit_email"
-                [(ngModel)]="editForm.email"
-                required
-              />
+              <label for="task-desc">Descripción / Instrucciones</label>
+              <textarea
+                id="task-desc"
+                rows="3"
+                placeholder="Detalles sobre lo que debe realizarse..."
+                [(ngModel)]="taskForm.description"
+                name="taskDesc"
+                class="clean-textarea"
+              ></textarea>
+            </div>
+
+            <div class="form-row">
+              <div class="form-field flex-1">
+                <label for="task-priority">Prioridad</label>
+                <select id="task-priority" [(ngModel)]="taskForm.priority" name="taskPriority" class="clean-select">
+                  <option value="low">Baja</option>
+                  <option value="medium">Media</option>
+                  <option value="high">Alta</option>
+                </select>
+              </div>
+
+              @if (isEditingTask) {
+                <div class="form-field flex-1">
+                  <label for="task-status">Estado</label>
+                  <select id="task-status" [(ngModel)]="taskForm.status" name="taskStatus" class="clean-select">
+                    <option value="pending">Pendiente</option>
+                    <option value="in_progress">En curso</option>
+                    <option value="completed">Completada</option>
+                  </select>
+                </div>
+              }
             </div>
 
             <div class="form-field">
-              <label for="edit_password">Nueva Contraseña (Opcional)</label>
+              <label for="task-assignee">Asignar Responsable</label>
+              <select id="task-assignee" [(ngModel)]="taskForm.assigned_to" name="taskAssignee" class="clean-select">
+                <option [ngValue]="null">-- Sin asignar --</option>
+                @for (member of projectMembers; track member.user_id) {
+                  <option [ngValue]="member.user_id">
+                    {{ member.username }} ({{ member.role === 'owner' ? 'Líder' : 'Miembro' }})
+                  </option>
+                }
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label for="task-due">Fecha Límite (Opcional)</label>
               <input
-                id="edit_password"
-                type="password"
-                name="edit_password"
-                [(ngModel)]="editForm.password"
-                placeholder="Dejar en blanco para conservar"
+                id="task-due"
+                type="date"
+                [(ngModel)]="taskForm.due_date"
+                name="taskDueDate"
+                class="clean-input"
               />
             </div>
 
             <div class="modal-actions">
-              <button type="button" class="btn-secondary" (click)="closeEditModal()">Cancelar</button>
-              <button type="submit" class="btn-primary" [disabled]="isSubmitting">
-                {{ isSubmitting ? 'Guardando...' : 'Guardar Cambios' }}
+              <button type="button" class="btn-secondary" (click)="closeTaskModal()">Cancelar</button>
+              <button type="submit" class="btn-primary" [disabled]="isSubmittingTask">
+                @if (!isSubmittingTask) {
+                  <span>{{ isEditingTask ? 'Guardar Cambios' : 'Crear Tarea' }}</span>
+                } @else {
+                  <ion-spinner name="dots"></ion-spinner>
+                }
               </button>
             </div>
           </form>
         </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <!-- ================================================================= -->
+  <!-- MODAL: INVITAR MIEMBRO A PROYECTO -->
+  <!-- ================================================================= -->
+  <ion-modal [isOpen]="isInviteModalOpen" (didDismiss)="closeInviteModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Invitar al Equipo</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeInviteModal()">
+              <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="custom-content ion-padding">
+        <div class="invite-header-desc">
+          <p>Busca entre los usuarios registrados en TeamFlow para incorporarlos al proyecto.</p>
+        </div>
+
+        <ion-searchbar
+          placeholder="Buscar por usuario o correo..."
+          [(ngModel)]="userSearchQuery"
+          (ionInput)="onSearchChange($event)"
+          [debounce]="300"
+          class="custom-searchbar"
+        ></ion-searchbar>
+
+        @if (isLoadingUsers) {
+          <div class="state-msg">
+            <ion-spinner name="crescent" color="primary"></ion-spinner>
+            <span>Buscando usuarios disponibles...</span>
+          </div>
+        }
+
+        @if (!isLoadingUsers && availableUsers.length === 0) {
+          <div class="empty-tasks-state">
+            <ion-icon name="people-outline"></ion-icon>
+            <p>No se encontraron otros usuarios disponibles para invitar.</p>
+          </div>
+        }
+
+        @if (!isLoadingUsers && availableUsers.length > 0) {
+          <div class="available-users-list">
+            @for (user of availableUsers; track user.id) {
+              <div class="available-user-card">
+                <div class="user-avatar-small">
+                  {{ (user.username[0] || 'U') | uppercase }}
+                </div>
+                <div class="user-details">
+                  <strong>{{ user.username }}</strong>
+                  <span>{{ user.email }}</span>
+                </div>
+                <button type="button" class="btn-add-member" (click)="addMemberToProject(user)">
+                  <ion-icon name="person-add-outline"></ion-icon>
+                  Agregar
+                </button>
+              </div>
+            }
+          </div>
+        }
       </ion-content>
     </ng-template>
   </ion-modal>

@@ -10,118 +10,273 @@ ion-header {
   --background: #2c3338;
 }
 
-/* BARRA DE ACCIÓN SUPERIOR */
-.top-action-bar {
+.header-action-btn {
+  font-weight: 600;
+  --color: #ea4c88;
+}
+
+/* =========================================================================
+   BARRA SUPERIOR DE RESUMEN
+   ========================================================================= */
+.projects-summary-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 1.25rem;
 
-  .list-info {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-
-    h3 {
-      margin: 0;
-      font-size: 1.05rem;
-      font-weight: 600;
-      color: #ffffff;
-    }
-
-    .badge {
-      background-color: #4b525a;
-      color: #eee;
-      font-size: 0.75rem;
-      font-weight: 600;
-      padding: 0.15rem 0.5rem;
-      border-radius: 0.25rem;
-    }
-  }
-
-  .btn-add-user {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    background-color: #ea4c88;
+  .welcome-title {
+    margin: 0;
+    font-size: 1.35rem;
+    font-weight: 700;
     color: #ffffff;
-    font-weight: 600;
+  }
+
+  .welcome-sub {
+    margin: 0.25rem 0 0 0;
     font-size: 0.85rem;
-    padding: 0.6rem 0.9rem;
-    border: none;
-    border-radius: 0.35rem;
-    cursor: pointer;
-    transition: background-color 0.2s;
+    color: #9da3a8;
+  }
 
-    &:hover {
-      background-color: #d44179;
-    }
-
-    ion-icon {
-      font-size: 1.1rem;
-    }
+  .badge-counter {
+    background-color: #3b4249;
+    color: #f1f3f5;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.35rem 0.75rem;
+    border-radius: 1rem;
+    border: 1px solid #485058;
   }
 }
 
-/* TARJETA DE FORMULARIO DENTRO DEL MODAL */
-.form-card {
-  background-color: #353b41;
-  border-radius: 0.5rem;
-  padding: 1.25rem;
-  border: 1px solid #434a52;
-
-  &.modal-card {
-    margin-top: 0.5rem;
-  }
+/* =========================================================================
+   ESTADO VACÍO & CARGA
+   ========================================================================= */
+.state-msg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 2.5rem 1rem;
+  color: #8c939a;
+  font-size: 0.9rem;
 }
 
-.card-title {
-  margin: 0 0 1rem 0;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #ffffff;
-}
-
-/* ESTRUCTURA DEL FORMULARIO */
-.clean-form {
+.empty-state {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  align-items: center;
+  text-align: center;
+  padding: 3rem 1.5rem;
+  background-color: #353b41;
+  border-radius: 0.75rem;
+  border: 1px dashed #485058;
+  margin-top: 1rem;
 
-  .form-field {
+  .empty-icon {
+    font-size: 3.5rem;
+    color: #ea4c88;
+    margin-bottom: 1rem;
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #ffffff;
+  }
+
+  p {
+    margin: 0.5rem 0 1.5rem 0;
+    font-size: 0.9rem;
+    color: #9da3a8;
+    max-width: 320px;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    width: auto;
+    padding: 0.75rem 1.25rem;
+  }
+}
+
+/* =========================================================================
+   GRILLA DE PROYECTOS
+   ========================================================================= */
+.projects-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.project-card {
+  background-color: #353b41;
+  border: 1px solid #434a52;
+  border-radius: 0.65rem;
+  padding: 1.15rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+
+  &:active {
+    transform: scale(0.99);
+  }
+
+  &:hover {
+    border-color: #ea4c88;
+  }
+
+  .card-top {
     display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.6rem;
 
-    label {
-      font-size: 0.85rem;
-      color: #b2b7bc;
-      font-weight: 500;
+    .card-header-left {
+      display: flex;
+      gap: 0.4rem;
+    }
+  }
+
+  .role-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 0.15rem 0.5rem;
+    border-radius: 0.25rem;
+    background-color: #4b525a;
+    color: #cbd5e1;
+
+    &.owner {
+      background-color: #1e3a8a;
+      color: #93c5fd;
+    }
+  }
+
+  .status-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    border-radius: 0.25rem;
+    background-color: rgba(34, 197, 94, 0.15);
+    color: #4ade80;
+
+    &.completed {
+      background-color: rgba(148, 163, 184, 0.2);
+      color: #94a3b8;
+    }
+  }
+
+  .card-header-actions {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .project-title {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #ffffff;
+  }
+
+  .project-desc {
+    margin: 0.4rem 0 0.85rem 0;
+    font-size: 0.85rem;
+    color: #a0a6ad;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .progress-section {
+    margin: 0.75rem 0;
+
+    .progress-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: #8c939a;
+      margin-bottom: 0.3rem;
+
+      strong {
+        color: #e2e8f0;
+      }
     }
 
-    input {
-      background-color: #3b4148;
-      border: 1px solid #484f56;
-      border-radius: 0.25rem;
-      padding: 0.75rem 0.875rem;
-      color: #eee;
-      font-size: 0.9rem;
-      outline: none;
-      transition: border-color 0.2s, background-color 0.2s;
+    ion-progress-bar {
+      --background: #252a2e;
+      --progress-background: #10b981;
+      height: 6px;
+      border-radius: 3px;
+    }
+  }
 
-      &::placeholder {
-        color: #727a82;
-      }
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 0.75rem;
+    padding-top: 0.65rem;
+    border-top: 1px solid #3e444b;
 
-      &:focus {
-        border-color: #ea4c88;
-        background-color: #434a52;
+    .footer-meta {
+      display: flex;
+      gap: 0.85rem;
+
+      .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        font-size: 0.8rem;
+        color: #9da3a8;
+
+        ion-icon {
+          font-size: 0.95rem;
+          color: #ea4c88;
+        }
       }
+    }
+
+    .open-action {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #ea4c88;
     }
   }
 }
 
-/* BOTONES */
+/* =========================================================================
+   BOTONES E ÍCONOS COMPARTIDOS
+   ========================================================================= */
+.btn-icon-tiny {
+  background: transparent;
+  border: none;
+  color: #9da3a8;
+  font-size: 1.1rem;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s, background-color 0.15s;
+
+  &:hover {
+    color: #60a5fa;
+    background-color: rgba(96, 165, 250, 0.15);
+  }
+
+  &.delete:hover {
+    color: #f87171;
+    background-color: rgba(248, 113, 113, 0.15);
+  }
+}
+
 .btn-primary {
   width: 100%;
   background-color: #ea4c88;
@@ -130,9 +285,12 @@ ion-header {
   font-size: 0.9rem;
   padding: 0.85rem;
   border: none;
-  border-radius: 0.25rem;
+  border-radius: 0.35rem;
   cursor: pointer;
-  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
   transition: background-color 0.2s;
 
   &:hover:not(:disabled) {
@@ -152,7 +310,7 @@ ion-header {
   font-size: 0.9rem;
   padding: 0.85rem;
   border: none;
-  border-radius: 0.25rem;
+  border-radius: 0.35rem;
   cursor: pointer;
   transition: background-color 0.2s;
 
@@ -161,10 +319,22 @@ ion-header {
   }
 }
 
+.btn-secondary-small {
+  background-color: #4b525a;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.8rem;
+  padding: 0.5rem 0.85rem;
+  border: none;
+  border-radius: 0.3rem;
+  cursor: pointer;
+  margin-top: 0.5rem;
+}
+
 .modal-actions {
   display: flex;
   gap: 0.75rem;
-  margin-top: 0.5rem;
+  margin-top: 0.75rem;
 
   .btn-secondary {
     flex: 1;
@@ -176,76 +346,534 @@ ion-header {
   }
 }
 
-/* ESTADOS DE CARGA Y VACÍO */
-.state-msg {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 2.5rem 1rem;
-  color: #8c939a;
-  font-size: 0.9rem;
+/* =========================================================================
+   FORMULARIOS
+   ========================================================================= */
+.form-card {
+  background-color: #353b41;
+  border-radius: 0.65rem;
+  padding: 1.25rem;
+  border: 1px solid #434a52;
 }
 
-/* LISTA DE USUARIOS */
-.user-list {
+.clean-form {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 1rem;
+
+  .form-row {
+    display: flex;
+    gap: 0.75rem;
+
+    .flex-1 {
+      flex: 1;
+    }
+  }
+
+  .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+
+    label {
+      font-size: 0.85rem;
+      color: #b2b7bc;
+      font-weight: 500;
+    }
+
+    input,
+    .clean-input,
+    .clean-textarea,
+    .clean-select {
+      background-color: #3b4148;
+      border: 1px solid #484f56;
+      border-radius: 0.35rem;
+      padding: 0.75rem 0.875rem;
+      color: #eee;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s, background-color 0.2s;
+
+      &::placeholder {
+        color: #727a82;
+      }
+
+      &:focus {
+        border-color: #ea4c88;
+        background-color: #434a52;
+      }
+    }
+
+    .clean-select {
+      cursor: pointer;
+    }
+  }
 }
 
-.user-item {
+/* =========================================================================
+   SEGMENTOS Y PESTAÑAS DENTRO DEL DETALLE
+   ========================================================================= */
+.segment-toolbar {
+  --background: #1e2226;
+  --border-color: #363b41;
+  padding: 0 0.5rem 0.5rem 0.5rem;
+}
+
+.custom-segment-container {
+  display: flex;
+  background-color: #2c3338;
+  border-radius: 0.5rem;
+  padding: 0.25rem;
+  gap: 0.25rem;
+
+  .tab-pill {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #9da3a8;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.55rem;
+    border-radius: 0.4rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    transition: background-color 0.15s, color 0.15s;
+
+    &.active {
+      background-color: #ea4c88;
+      color: #ffffff;
+    }
+  }
+}
+
+/* =========================================================================
+   VISTA DE TAREAS DENTRO DEL PROYECTO
+   ========================================================================= */
+.tasks-action-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-bottom: 0.85rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+
+  .filter-pills {
+    display: flex;
+    gap: 0.3rem;
+    overflow-x: auto;
+
+    button {
+      background-color: #353b41;
+      border: 1px solid #434a52;
+      color: #9da3a8;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.35rem 0.65rem;
+      border-radius: 1rem;
+      cursor: pointer;
+      white-space: nowrap;
+
+      &.active {
+        background-color: #4b525a;
+        color: #ffffff;
+        border-color: #60a5fa;
+      }
+    }
+  }
+
+  .btn-create-task {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    background-color: #ea4c88;
+    color: #ffffff;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.45rem 0.8rem;
+    border: none;
+    border-radius: 0.35rem;
+    cursor: pointer;
+  }
+}
+
+.detail-progress-card {
+  background-color: #353b41;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid #434a52;
+
+  .progress-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: #9da3a8;
+    margin-bottom: 0.35rem;
+
+    strong {
+      color: #ffffff;
+    }
+  }
+
+  ion-progress-bar {
+    --background: #252a2e;
+    --progress-background: #10b981;
+    height: 6px;
+    border-radius: 3px;
+  }
+}
+
+.empty-tasks-state {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  color: #8c939a;
+
+  ion-icon {
+    font-size: 2.5rem;
+    color: #555d65;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.85rem;
+  }
+}
+
+.tasks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.task-item-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
   background-color: #353b41;
   border: 1px solid #434a52;
-  border-radius: 0.25rem;
-  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  padding: 0.85rem 1rem;
+  transition: opacity 0.2s;
 
-  .user-info {
+  &.completed {
+    opacity: 0.75;
+    border-color: #354f3f;
+  }
+
+  .task-status-btn {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    margin-top: 0.1rem;
+    display: flex;
+    align-items: center;
+
+    &.status-pending ion-icon {
+      color: #9da3a8;
+    }
+
+    &.status-progress ion-icon {
+      color: #f59e0b;
+    }
+
+    &.status-done ion-icon {
+      color: #10b981;
+    }
+  }
+
+  .task-info {
+    flex: 1;
+
+    .task-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+
+      .task-title {
+        margin: 0;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #ffffff;
+
+        &.strikethrough {
+          text-decoration: line-through;
+          color: #94a3b8;
+        }
+      }
+
+      .priority-pill {
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        padding: 0.15rem 0.45rem;
+        border-radius: 0.25rem;
+
+        &.priority-high {
+          background-color: rgba(239, 68, 68, 0.2);
+          color: #f87171;
+        }
+
+        &.priority-medium {
+          background-color: rgba(245, 158, 11, 0.2);
+          color: #fbbf24;
+        }
+
+        &.priority-low {
+          background-color: rgba(34, 197, 94, 0.2);
+          color: #4ade80;
+        }
+      }
+    }
+
+    .task-desc {
+      margin: 0.3rem 0 0.6rem 0;
+      font-size: 0.8rem;
+      color: #a0a6ad;
+      line-height: 1.3;
+    }
+
+    .task-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.35rem;
+
+      .status-chip,
+      .assigned-chip,
+      .unassigned-chip,
+      .due-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.72rem;
+        padding: 0.2rem 0.5rem;
+        border-radius: 0.3rem;
+        background-color: #3e454d;
+        color: #cbd5e1;
+      }
+
+      .assigned-chip {
+        color: #93c5fd;
+        background-color: rgba(59, 130, 246, 0.15);
+
+        ion-icon {
+          font-size: 0.8rem;
+        }
+      }
+
+      .unassigned-chip {
+        color: #a0a6ad;
+        font-style: italic;
+      }
+
+      .due-chip {
+        color: #fbbf24;
+        background-color: rgba(245, 158, 11, 0.15);
+
+        ion-icon {
+          font-size: 0.8rem;
+        }
+      }
+    }
+  }
+
+  .task-actions {
     display: flex;
     flex-direction: column;
-    gap: 0.15rem;
+    gap: 0.2rem;
+  }
+}
 
-    .user-name {
+/* =========================================================================
+   VISTA DE MIEMBROS & EQUIPO
+   ========================================================================= */
+.members-action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+
+  .section-title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #ffffff;
+  }
+
+  .section-subtitle {
+    margin: 0.2rem 0 0 0;
+    font-size: 0.8rem;
+    color: #9da3a8;
+  }
+
+  .btn-invite {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    background-color: #ea4c88;
+    color: #ffffff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.55rem 0.9rem;
+    border: none;
+    border-radius: 0.35rem;
+    cursor: pointer;
+  }
+}
+
+.members-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.member-item-card {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  background-color: #353b41;
+  border: 1px solid #434a52;
+  border-radius: 0.5rem;
+  padding: 0.85rem 1rem;
+
+  .member-avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background-color: #4f46e5;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 1.05rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .member-info {
+    flex: 1;
+
+    .member-name-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      .member-name {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #ffffff;
+      }
+
+      .member-role-badge {
+        font-size: 0.65rem;
+        font-weight: 700;
+        padding: 0.15rem 0.45rem;
+        border-radius: 0.25rem;
+        background-color: #4b525a;
+        color: #cbd5e1;
+
+        &.owner {
+          background-color: #1e3a8a;
+          color: #93c5fd;
+        }
+      }
+    }
+
+    .member-email {
+      font-size: 0.8rem;
+      color: #9da3a8;
+    }
+  }
+}
+
+/* =========================================================================
+   MODAL DE INVITAR USUARIO
+   ========================================================================= */
+.invite-header-desc {
+  margin-bottom: 0.5rem;
+
+  p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #9da3a8;
+  }
+}
+
+.custom-searchbar {
+  --background: #353b41;
+  --color: #ffffff;
+  --placeholder-color: #727a82;
+  --icon-color: #ea4c88;
+  padding: 0;
+  margin-bottom: 1rem;
+}
+
+.available-users-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.available-user-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: #353b41;
+  border: 1px solid #434a52;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+
+  .user-avatar-small {
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 50%;
+    background-color: #059669;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .user-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    strong {
       font-size: 0.9rem;
-      font-weight: 600;
       color: #ffffff;
     }
 
-    .user-email {
+    span {
       font-size: 0.8rem;
       color: #9da3a8;
     }
   }
 
-  .user-actions {
+  .btn-add-member {
     display: flex;
-    gap: 0.35rem;
+    align-items: center;
+    gap: 0.3rem;
+    background-color: #ea4c88;
+    color: #ffffff;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.45rem 0.75rem;
+    border: none;
+    border-radius: 0.3rem;
+    cursor: pointer;
+    transition: background-color 0.15s;
 
-    .btn-icon {
-      background: transparent;
-      border: 1px solid transparent;
-      color: #b2b7bc;
-      font-size: 1.1rem;
-      padding: 0.35rem;
-      border-radius: 0.25rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: color 0.2s, background-color 0.2s;
-
-      &.edit:hover {
-        color: #60a5fa;
-        background-color: rgba(96, 165, 250, 0.1);
-      }
-
-      &.delete:hover {
-        color: #f87171;
-        background-color: rgba(248, 113, 113, 0.1);
-      }
+    &:hover {
+      background-color: #d44179;
     }
   }
 }

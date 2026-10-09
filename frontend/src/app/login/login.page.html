@@ -34,24 +34,26 @@
         </div>
 
         <!-- Email field (displayed only in Sign Up mode) -->
-        <div *ngIf="isSignUp" class="form__field">
-          <label for="login__email">
-            <svg class="icon">
-              <use xlink:href="#icon-mail"></use>
-            </svg>
-            <span class="hidden">Email</span>
-          </label>
-          <input
-            autocomplete="email"
-            id="login__email"
-            type="email"
-            name="email"
-            [(ngModel)]="email"
-            class="form__input"
-            placeholder="Email"
-            required
-          >
-        </div>
+        @if (isSignUp) {
+          <div class="form__field">
+            <label for="login__email">
+              <svg class="icon">
+                <use xlink:href="#icon-mail"></use>
+              </svg>
+              <span class="hidden">Email</span>
+            </label>
+            <input
+              autocomplete="email"
+              id="login__email"
+              type="email"
+              name="email"
+              [(ngModel)]="email"
+              class="form__input"
+              placeholder="Email"
+              required
+            >
+          </div>
+        }
 
         <!-- Password field -->
         <div class="form__field">
@@ -73,23 +75,25 @@
         </div>
 
         <!-- Confirm Password field (displayed only in Sign Up mode) -->
-        <div *ngIf="isSignUp" class="form__field">
-          <label for="login__confirm_password">
-            <svg class="icon">
-              <use xlink:href="#icon-lock"></use>
-            </svg>
-            <span class="hidden">Confirm Password</span>
-          </label>
-          <input
-            id="login__confirm_password"
-            type="password"
-            name="confirmPassword"
-            [(ngModel)]="confirmPassword"
-            class="form__input"
-            placeholder="Confirm Password"
-            required
-          >
-        </div>
+        @if (isSignUp) {
+          <div class="form__field">
+            <label for="login__confirm_password">
+              <svg class="icon">
+                <use xlink:href="#icon-lock"></use>
+              </svg>
+              <span class="hidden">Confirm Password</span>
+            </label>
+            <input
+              id="login__confirm_password"
+              type="password"
+              name="confirmPassword"
+              [(ngModel)]="confirmPassword"
+              class="form__input"
+              placeholder="Confirm Password"
+              required
+            >
+          </div>
+        }
 
         <!-- Submit button -->
         <div class="form__field">

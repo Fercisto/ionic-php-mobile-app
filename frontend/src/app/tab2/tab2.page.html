@@ -1,31 +1,147 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title> Photo Gallery </ion-title>
+    <ion-title>Mis Tareas</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="loadMyTasks()" color="primary">
+        <ion-icon slot="icon-only" name="refresh-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Photo Gallery</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [fullscreen]="true" class="custom-content ion-padding">
+  <ion-refresher slot="fixed" (ionRefresh)="loadMyTasks($event)">
+    <ion-refresher-content pullingText="Desliza para actualizar..." refreshingSpinner="circles">
+    </ion-refresher-content>
+  </ion-refresher>
 
-  <ion-grid>
-    <ion-row>
-      @for (photo of photoService.photos(); track photo.filepath; let position = $index) {
-      <ion-col size="6">
-        <button (click)="showActionSheet(photo, position)">
-          <img [src]="photo.webviewPath" [attr.alt]="'Photo ' + (position + 1)" loading="lazy" />
-        </button>
-      </ion-col>
+  <div class="tasks-summary-bar">
+    <div>
+      <h2 class="welcome-title">Tareas Asignadas</h2>
+      <p class="welcome-sub">Seguimiento de tus responsabilidades en cada proyecto</p>
+    </div>
+  </div>
+
+  <!-- Contadores rápidos -->
+  @if (myTasks.length > 0) {
+    <div class="stats-cards-grid">
+      <button
+        type="button"
+        class="stat-card"
+        [class.selected]="activeFilter === 'all'"
+        (click)="activeFilter = 'all'"
+      >
+        <span class="stat-num">{{ myTasks.length }}</span>
+        <span class="stat-label">Total</span>
+      </button>
+      <button
+        type="button"
+        class="stat-card pending"
+        [class.selected]="activeFilter === 'pending'"
+        (click)="activeFilter = 'pending'"
+      >
+        <span class="stat-num">{{ pendingCount }}</span>
+        <span class="stat-label">Pendientes</span>
+      </button>
+      <button
+        type="button"
+        class="stat-card in-progress"
+        [class.selected]="activeFilter === 'in_progress'"
+        (click)="activeFilter = 'in_progress'"
+      >
+        <span class="stat-num">{{ inProgressCount }}</span>
+        <span class="stat-label">En curso</span>
+      </button>
+      <button
+        type="button"
+        class="stat-card completed"
+        [class.selected]="activeFilter === 'completed'"
+        (click)="activeFilter = 'completed'"
+      >
+        <span class="stat-num">{{ completedCount }}</span>
+        <span class="stat-label">Hechas</span>
+      </button>
+    </div>
+  }
+
+  <!-- Spinner -->
+  @if (isLoading && myTasks.length === 0) {
+    <div class="state-msg">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+      <span>Cargando tus tareas...</span>
+    </div>
+  }
+
+  <!-- Estado vacío -->
+  @if (!isLoading && myTasks.length === 0) {
+    <div class="empty-state">
+      <ion-icon name="checkbox-outline" class="empty-icon"></ion-icon>
+      <h3>No tienes tareas asignadas</h3>
+      <p>Cuando tú o tu equipo asignen tareas a tu usuario en algún proyecto, aparecerán aquí.</p>
+    </div>
+  }
+
+  <!-- Lista de tareas -->
+  @if (filteredTasks.length > 0) {
+    <div class="tasks-list">
+      @for (task of filteredTasks; track task.id) {
+        <div
+          class="task-item-card"
+          [class.completed]="task.status === 'completed'"
+        >
+          <button
+            type="button"
+            class="task-status-btn"
+            [class.status-pending]="task.status === 'pending'"
+            [class.status-progress]="task.status === 'in_progress'"
+            [class.status-done]="task.status === 'completed'"
+            (click)="toggleTaskStatus(task)"
+            title="Cambiar estado"
+          >
+            <ion-icon
+              [name]="task.status === 'completed' ? 'checkmark-circle-outline' : (task.status === 'in_progress' ? 'time-outline' : 'ellipse-outline')"
+            ></ion-icon>
+          </button>
+
+          <div class="task-info">
+            @if (task.project_title) {
+              <div class="task-project-pill">
+                <ion-icon name="folder-outline"></ion-icon>
+                {{ task.project_title }}
+              </div>
+            }
+
+            <div class="task-title-row">
+              <h4 class="task-title" [class.strikethrough]="task.status === 'completed'">{{ task.title }}</h4>
+              <span class="priority-pill" [class]="'priority-' + task.priority">
+                {{ getPriorityLabel(task.priority) }}
+              </span>
+            </div>
+
+            @if (task.description) {
+              <p class="task-desc">{{ task.description }}</p>
+            }
+
+            <div class="task-badges">
+              <span class="status-chip" [class]="'chip-' + task.status">
+                {{ getStatusLabel(task.status) }}
+              </span>
+              @if (task.due_date) {
+                <span class="due-chip">
+                  <ion-icon name="calendar-outline"></ion-icon>
+                  {{ task.due_date }}
+                </span>
+              }
+            </div>
+          </div>
+        </div>
       }
-    </ion-row>
-  </ion-grid>
+    </div>
+  }
 
-  <ion-fab vertical="bottom" horizontal="center" slot="fixed">
-    <ion-fab-button (click)="addPhotoToGallery()">
-      <ion-icon name="camera"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
+  @if (!isLoading && myTasks.length > 0 && filteredTasks.length === 0) {
+    <div class="empty-filter-state">
+      <p>No hay tareas que coincidan con el filtro seleccionado.</p>
+    </div>
+  }
 </ion-content>
