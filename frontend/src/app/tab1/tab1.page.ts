@@ -38,7 +38,9 @@ import {
   checkboxOutline,
   listOutline,
   checkmarkDoneOutline,
-  arrowForwardOutline
+  arrowForwardOutline,
+  bluetoothOutline,
+  sendOutline
 } from 'ionicons/icons';
 import { AuthService, UserProfile } from '../services/auth.service';
 import {
@@ -48,6 +50,9 @@ import {
   TaskItem,
   AvailableUser
 } from '../services/project.service';
+import { BluetoothService, NearbyDevice } from '../services/bluetooth.service';
+import { UserService, UserItem } from '../services/user.service';
+import { lastValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-tab1',
@@ -78,6 +83,8 @@ export class Tab1Page implements OnInit {
   private toastCtrl = inject(ToastController);
   private navCtrl = inject(NavController);
   private cdr = inject(ChangeDetectorRef);
+  private bluetooth = inject(BluetoothService);
+  private userService = inject(UserService);
 
   currentUser: UserProfile | null = null;
   projects: Project[] = [];
@@ -123,6 +130,11 @@ export class Tab1Page implements OnInit {
   userSearchQuery: string = '';
   isLoadingUsers: boolean = false;
 
+  // Invitar por Bluetooth (dentro del modal de invitación)
+  nearbyUsers: NearbyUser[] = [];
+  isScanningBluetooth: boolean = false;
+  sendingToDeviceId: string | null = null;
+
   constructor() {
     addIcons({
       folderOpenOutline,
@@ -142,7 +154,9 @@ export class Tab1Page implements OnInit {
       checkboxOutline,
       listOutline,
       checkmarkDoneOutline,
-      arrowForwardOutline
+      arrowForwardOutline,
+      bluetoothOutline,
+      sendOutline
     });
   }
 
@@ -589,6 +603,8 @@ export class Tab1Page implements OnInit {
   closeInviteModal(): void {
     this.isInviteModalOpen = false;
     this.availableUsers = [];
+    this.nearbyUsers = [];
+    void this.bluetooth.stopScan();
     this.cdr.detectChanges();
   }
 
@@ -641,6 +657,73 @@ export class Tab1Page implements OnInit {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  // =========================================================================
+  // INVITAR POR BLUETOOTH
+  // =========================================================================
+
+  get canUseBluetooth(): boolean {
+    return this.bluetooth.isSupported;
+  }
+
+  async scanNearbyUsers(): Promise<void> {
+    if (!this.selectedProject || this.isScanningBluetooth) return;
+    this.nearbyUsers = [];
+    this.isScanningBluetooth = true;
+    this.cdr.detectChanges();
+
+    // Los teléfonos cercanos solo anuncian el ID del usuario; el nombre se busca en la lista de usuarios.
+    const users = await lastValueFrom(this.userService.getUsers())
+      .then(res => res.data ?? [])
+      .catch(() => [] as UserItem[]);
+
+    try {
+      await this.bluetooth.scanNearby(device => this.addNearbyUser(device, users));
+    } catch (error) {
+      this.presentToast((error as Error).message || 'No se pudo buscar por Bluetooth.', 'danger');
+    } finally {
+      this.isScanningBluetooth = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  private addNearbyUser(device: NearbyDevice, users: UserItem[]): void {
+    if (device.userId === this.currentUser?.id) return;
+    if (this.nearbyUsers.some(u => u.deviceId === device.deviceId)) return;
+
+    const user = users.find(u => u.id === device.userId);
+    this.nearbyUsers.push({
+      ...device,
+      username: user?.username ?? `Usuario #${device.userId}`,
+      email: user?.email ?? '',
+      isMember: this.projectMembers.some(m => m.user_id === device.userId),
+      invited: false
+    });
+    this.cdr.detectChanges();
+  }
+
+  async sendBluetoothInvite(nearby: NearbyUser): Promise<void> {
+    if (!this.selectedProject || !this.currentUser || this.sendingToDeviceId) return;
+    this.sendingToDeviceId = nearby.deviceId;
+    this.cdr.detectChanges();
+
+    try {
+      await this.bluetooth.sendInvitation(nearby.deviceId, {
+        type: 'project_invite',
+        project_id: this.selectedProject.id,
+        project_title: this.selectedProject.title,
+        from_user_id: this.currentUser.id,
+        from_username: this.currentUser.username
+      });
+      nearby.invited = true;
+      this.presentToast(`Invitación enviada a ${nearby.username}.`, 'success');
+    } catch (error) {
+      this.presentToast((error as Error).message || 'No se pudo enviar la invitación.', 'danger');
+    } finally {
+      this.sendingToDeviceId = null;
+      this.cdr.detectChanges();
+    }
   }
 
   async confirmRemoveMember(member: ProjectMember): Promise<void> {
@@ -714,4 +797,11 @@ export class Tab1Page implements OnInit {
     if (total === 0) return 0;
     return (project.completed_tasks_count || 0) / total;
   }
+}
+
+interface NearbyUser extends NearbyDevice {
+  username: string;
+  email: string;
+  isMember: boolean;
+  invited: boolean;
 }

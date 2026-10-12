@@ -34,6 +34,38 @@
   }
 
   @if (user) {
+    <div class="bluetooth-card" [class.active]="isReceiving">
+      <div class="bluetooth-header">
+        <ion-icon name="bluetooth-outline"></ion-icon>
+        <div>
+          <h3>Recibir invitaciones</h3>
+          <p>
+            @if (isReceiving) {
+              Visible por Bluetooth. Pide a un líder que te invite desde su proyecto.
+            } @else {
+              Activa esta opción para que un compañero cercano te invite a su proyecto por Bluetooth.
+            }
+          </p>
+        </div>
+      </div>
+
+      @if (isReceiving) {
+        <div class="waiting">
+          <ion-spinner name="dots"></ion-spinner>
+          <span>Esperando invitaciones...</span>
+        </div>
+      }
+
+      <ion-button expand="block" [fill]="isReceiving ? 'outline' : 'solid'" [disabled]="isStartingBluetooth" (click)="toggleReceiving()">
+        @if (isStartingBluetooth) {
+          <ion-spinner name="crescent" slot="start"></ion-spinner>
+        }
+        {{ isReceiving ? 'Dejar de recibir' : 'Recibir por Bluetooth' }}
+      </ion-button>
+    </div>
+  }
+
+  @if (user) {
     <ion-button expand="block" color="danger" (click)="logout()" class="logout-btn">
       <ion-icon name="log-out-outline" slot="start"></ion-icon>
       Cerrar Sesión

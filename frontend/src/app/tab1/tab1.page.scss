@@ -877,3 +877,71 @@ ion-header {
     }
   }
 }
+/* =========================================================================
+   INVITAR POR BLUETOOTH
+   ========================================================================= */
+.bluetooth-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.85rem;
+  margin-bottom: 1rem;
+  border: 1px dashed #434a52;
+  border-radius: 0.6rem;
+
+  .bluetooth-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+
+    strong {
+      display: block;
+      font-size: 0.9rem;
+      color: #ffffff;
+    }
+
+    span {
+      font-size: 0.75rem;
+      color: #9da3a8;
+    }
+  }
+
+  .btn-scan {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex: 0 0 auto;
+    background: transparent;
+    color: #ea4c88;
+    border: 1px solid #ea4c88;
+    border-radius: 0.35rem;
+    padding: 0.45rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+
+    ion-spinner {
+      width: 1rem;
+      height: 1rem;
+      color: #ea4c88;
+    }
+  }
+
+  .btn-add-member {
+    &:disabled {
+      opacity: 0.5;
+    }
+
+    ion-spinner {
+      width: 0.9rem;
+      height: 0.9rem;
+      color: #ffffff;
+    }
+  }
+
+  .bluetooth-hint {
+    margin: 0;
+    font-size: 0.78rem;
+    color: #9da3a8;
+  }
+}

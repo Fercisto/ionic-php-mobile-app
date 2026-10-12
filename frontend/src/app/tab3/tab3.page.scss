@@ -49,6 +49,55 @@ ion-header {
   }
 }
 
+.bluetooth-card {
+  background-color: #353b41;
+  border: 1px solid #434a52;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  color: #ffffff;
+
+  &.active {
+    border-color: #ea4c88;
+  }
+
+  .bluetooth-header {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+
+    ion-icon {
+      font-size: 1.6rem;
+      color: #ea4c88;
+      flex: 0 0 auto;
+    }
+
+    h3 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 0.25rem 0 0 0;
+      font-size: 0.82rem;
+      color: #9da3a8;
+    }
+  }
+
+  .waiting {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+    color: #c9ced2;
+
+    ion-spinner {
+      color: #ea4c88;
+    }
+  }
+}
+
 .logout-btn {
   margin-top: 2rem;
 }

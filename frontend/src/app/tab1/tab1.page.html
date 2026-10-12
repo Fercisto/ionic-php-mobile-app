@@ -546,6 +546,54 @@
           <p>Busca entre los usuarios registrados en TeamFlow para incorporarlos al proyecto.</p>
         </div>
 
+        @if (canUseBluetooth) {
+          <div class="bluetooth-section">
+            <div class="bluetooth-section-header">
+              <div>
+                <strong>Cerca de ti</strong>
+                <span>Compañeros con "Recibir por Bluetooth" activo en su Perfil</span>
+              </div>
+              <button type="button" class="btn-scan" [disabled]="isScanningBluetooth" (click)="scanNearbyUsers()">
+                @if (isScanningBluetooth) {
+                  <ion-spinner name="crescent"></ion-spinner>
+                } @else {
+                  <ion-icon name="bluetooth-outline"></ion-icon>
+                }
+                {{ isScanningBluetooth ? 'Buscando...' : 'Buscar' }}
+              </button>
+            </div>
+
+            @for (nearby of nearbyUsers; track nearby.deviceId) {
+              <div class="available-user-card">
+                <div class="user-avatar-small">
+                  {{ (nearby.username[0] || 'U') | uppercase }}
+                </div>
+                <div class="user-details">
+                  <strong>{{ nearby.username }}</strong>
+                  <span>{{ nearby.isMember ? 'Ya es parte del equipo' : nearby.email }}</span>
+                </div>
+                <button
+                  type="button"
+                  class="btn-add-member"
+                  [disabled]="nearby.isMember || nearby.invited || sendingToDeviceId !== null"
+                  (click)="sendBluetoothInvite(nearby)"
+                >
+                  @if (sendingToDeviceId === nearby.deviceId) {
+                    <ion-spinner name="crescent"></ion-spinner>
+                  } @else {
+                    <ion-icon name="send-outline"></ion-icon>
+                  }
+                  {{ nearby.invited ? 'Enviada' : 'Invitar' }}
+                </button>
+              </div>
+            }
+
+            @if (!isScanningBluetooth && nearbyUsers.length === 0) {
+              <p class="bluetooth-hint">Toca "Buscar" cuando tu compañero esté listo para recibir.</p>
+            }
+          </div>
+        }
+
         <ion-searchbar
           placeholder="Buscar por usuario o correo..."
           [(ngModel)]="userSearchQuery"
